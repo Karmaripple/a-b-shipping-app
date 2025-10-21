@@ -1,59 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A+B Free Shipping Logic</title>
+    <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f6f6f7;
         }
-        .container {
-            background: #f9fafb;
-            border: 1px solid #e1e3e5;
+        .card {
+            background: white;
             border-radius: 8px;
-            padding: 30px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
         h1 {
             color: #202223;
-            margin-bottom: 10px;
+            margin-top: 0;
         }
-        p {
-            color: #6d7175;
-            line-height: 1.6;
-        }
-        .status {
-            background: #d4f5e9;
-            color: #108043;
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
             padding: 12px 16px;
-            border-radius: 6px;
-            margin-top: 20px;
-            font-weight: 500;
+            border-radius: 4px;
+            margin: 20px 0;
         }
         .info {
-            background: #fff;
-            border: 1px solid #e1e3e5;
-            border-radius: 6px;
-            padding: 16px;
-            margin-top: 20px;
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin: 20px 0;
         }
-        .info h3 {
-            margin-top: 0;
-            color: #202223;
+        code {
+            background: #f4f6f8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
         }
-        .info ul {
-            color: #6d7175;
+        ul {
             line-height: 1.8;
+        }
+        .loading {
+            text-align: center;
+            color: #637381;
+            font-size: 14px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="card">
         <h1>A+B Free Shipping Logic</h1>
-        <p>This Shopify Function app automatically manages shipping for A+B product combinations.</p>
         
-        <div class="status">
+        <div class="success">
             ✓ Function is active and ready to use
         </div>
         
@@ -65,12 +74,46 @@
                 <li>Set value to <code>None-free</code> for B-type products (paid items)</li>
                 <li>When cart contains both types, free shipping will be applied to A-type products</li>
             </ul>
-        </div>
-        
-        <div class="info">
+            
             <h3>Configuration:</h3>
             <p>No additional configuration needed. The function is automatically applied during checkout.</p>
         </div>
+        
+        <div class="loading">
+            Returning to settings page...
+        </div>
     </div>
+
+    <script>
+        // 检查是否在 Shopify Admin 中
+        var urlParams = new URLSearchParams(window.location.search);
+        var host = urlParams.get('host');
+        var shop = urlParams.get('shop');
+        
+        if (host || shop) {
+            // 在 Shopify Admin 中，初始化 App Bridge
+            try {
+                var AppBridge = window['app-bridge'];
+                var createApp = AppBridge.default;
+                var app = createApp({
+                    apiKey: 'eb9d911ec75b0d8f3e4d425d30af110e',
+                    host: host
+                });
+                
+                // 3秒后自动关闭并返回设置页面
+                setTimeout(function() {
+                    var Redirect = AppBridge.actions.Redirect;
+                    var redirect = Redirect.create(app);
+                    redirect.dispatch(Redirect.Action.ADMIN_PATH, '/settings/shipping');
+                }, 3000);
+            } catch (e) {
+                console.error('App Bridge error:', e);
+                // 如果 App Bridge 失败，尝试直接关闭
+                setTimeout(function() {
+                    window.close();
+                }, 3000);
+            }
+        }
+    </script>
 </body>
 </html>
